@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: oyindamola-dare-portfolio
+    runtime: static
+    buildCommand: ""
+    staticPublishPath: .
