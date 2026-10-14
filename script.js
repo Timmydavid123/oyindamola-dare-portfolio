@@ -4,6 +4,13 @@ const $$=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
 const nav=$(".nav"),menuBtn=$("#menuBtn"),navLinks=$("#navLinks"),year=$("#year"),portraitStage=$("#portraitStage"),portraitCard=$("#portraitCard"),cursorAura=$(".cursor-aura");
 if(year)year.textContent=new Date().getFullYear();
 
+// Keep the GAO Tek internship date accurate in the experience timeline.
+const gaoTimelineItem=$$('.timeline-item').find(item=>item.textContent.includes('GAO TEK INC.'));
+if(gaoTimelineItem){
+  const gaoDate=$('.timeline-date',gaoTimelineItem);
+  if(gaoDate)gaoDate.innerHTML='May 2026 — October 2026 <small>Remote</small>';
+}
+
 window.addEventListener("scroll",()=>nav?.classList.toggle("scrolled",window.scrollY>24));
 menuBtn?.addEventListener("click",()=>{const open=navLinks?.classList.toggle("open");menuBtn.setAttribute("aria-expanded",String(Boolean(open)));menuBtn.textContent=open?"×":"☰"});
 $$('.nav-links a').forEach(link=>link.addEventListener('click',()=>{navLinks?.classList.remove('open');menuBtn?.setAttribute('aria-expanded','false');if(menuBtn)menuBtn.textContent='☰'}));
@@ -24,7 +31,7 @@ const portfolio={
   results:'At Right Pick Stores, she achieved an 80% delivery rate on assigned orders, exceeding the company target. At Captain Cook Bakery, she contributed to improved workflows associated with a reported 15% reduction in processing time. At Polaris Bank, she handled customer interactions across phone, email and chat.',
   rightPick:'At Right Pick Stores, Oyindamola works as a Customer Service Representative & Sales Closer. Her responsibilities include lead follow-up, sales conversion, customer support, order processing, CRM updates, operational coordination and after-sales support.',
   polaris:'At Polaris Bank, she worked as a Customer Experience Expert from April 2025 to April 2026, managing high-volume customer interactions across phone, email and chat, identifying needs, resolving issues and collaborating with internal teams.',
-  gao:'At GAO Tek Inc., she supports HR and recruitment through candidate sourcing, screening, candidate communication, interview coordination, records, documentation and onboarding support.',
+  gao:'At GAO Tek Inc., she worked as an HR Intern from May 2026 to October 2026, supporting candidate sourcing, screening, candidate communication, interview coordination, records, documentation and onboarding support.',
   captain:'At Captain Cook Bakery, she supported payroll and allowance processes, daily operations and workflow coordination. She contributed to improved workflows associated with a reported 15% reduction in processing time.',
   dareys:'At Darey’s Store, she built early experience in customer service, retail sales, inventory, cash handling and promotional activities from 2019 to 2022.',
   tools:'Her documented tool experience includes Microsoft Word, Google Workspace / Google Suite, CRM tools, and customer communication across phone, email and chat.',
