@@ -1,193 +1,63 @@
-const $ = (s, ctx = document) => ctx.querySelector(s);
-const $$ = (s, ctx = document) => [...ctx.querySelectorAll(s)];
+const $=(selector,scope=document)=>scope.querySelector(selector);
+const $$=(selector,scope=document)=>[...scope.querySelectorAll(selector)];
 
-// Footer year
-$('#year').textContent = new Date().getFullYear();
+const nav=$(".nav"),menuBtn=$("#menuBtn"),navLinks=$("#navLinks"),year=$("#year"),portraitStage=$("#portraitStage"),portraitCard=$("#portraitCard"),cursorAura=$(".cursor-aura");
+if(year)year.textContent=new Date().getFullYear();
 
-// Glass navbar behaviour + mobile menu
-const nav = $('.nav');
-const menuBtn = $('#menuBtn');
-const navLinks = $('#navLinks');
-window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20), { passive: true });
-menuBtn.addEventListener('click', () => {
-  const open = navLinks.classList.toggle('open');
-  menuBtn.setAttribute('aria-expanded', String(open));
-});
-$$('#navLinks a').forEach(a => a.addEventListener('click', () => {
-  navLinks.classList.remove('open');
-  menuBtn.setAttribute('aria-expanded', 'false');
-}));
+window.addEventListener("scroll",()=>nav?.classList.toggle("scrolled",window.scrollY>24));
+menuBtn?.addEventListener("click",()=>{const open=navLinks?.classList.toggle("open");menuBtn.setAttribute("aria-expanded",String(Boolean(open)));menuBtn.textContent=open?"×":"☰"});
+$$('.nav-links a').forEach(link=>link.addEventListener('click',()=>{navLinks?.classList.remove('open');menuBtn?.setAttribute('aria-expanded','false');if(menuBtn)menuBtn.textContent='☰'}));
 
-// Scroll reveal
-const revealObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const delay = Number(entry.target.dataset.delay || 0);
-      setTimeout(() => entry.target.classList.add('visible'), delay);
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: .11 });
-$$('.reveal').forEach(el => revealObserver.observe(el));
+const revealObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(!entry.isIntersecting)return;const delay=Number(entry.target.dataset.delay||0);window.setTimeout(()=>entry.target.classList.add('is-visible'),delay);revealObserver.unobserve(entry.target)})},{threshold:.12});
+$$('.reveal').forEach(el=>revealObserver.observe(el));
 
-// Cursor aura
-const aura = $('.cursor-aura');
-let targetX = innerWidth / 2, targetY = innerHeight / 2;
-let auraX = targetX, auraY = targetY;
-window.addEventListener('pointermove', e => { targetX = e.clientX; targetY = e.clientY; }, { passive: true });
-function animateAura() {
-  auraX += (targetX - auraX) * .12;
-  auraY += (targetY - auraY) * .12;
-  aura.style.left = `${auraX}px`;
-  aura.style.top = `${auraY}px`;
-  requestAnimationFrame(animateAura);
-}
-animateAura();
-
-// 3D portrait motion
-const stage = $('#portraitStage');
-const portrait = $('#portraitCard');
-if (stage && portrait) {
-  stage.addEventListener('pointermove', e => {
-    const r = stage.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5;
-    const y = (e.clientY - r.top) / r.height - .5;
-    portrait.style.transform = `rotateY(${x * 15}deg) rotateX(${y * -12}deg) translateZ(8px)`;
-  });
-  stage.addEventListener('pointerleave', () => portrait.style.transform = 'rotateY(-8deg) rotateX(3deg)');
+if(window.matchMedia('(pointer:fine)').matches){
+  window.addEventListener('pointermove',event=>{if(cursorAura){cursorAura.style.left=`${event.clientX}px`;cursorAura.style.top=`${event.clientY}px`}});
+  portraitStage?.addEventListener('pointermove',event=>{if(!portraitCard)return;const rect=portraitStage.getBoundingClientRect();const x=(event.clientX-rect.left)/rect.width-.5;const y=(event.clientY-rect.top)/rect.height-.5;portraitCard.style.transform=`rotateY(${x*11-6}deg) rotateX(${y*-8+2}deg) translateZ(4px)`});
+  portraitStage?.addEventListener('pointerleave',()=>{if(portraitCard)portraitCard.style.transform='rotateY(-7deg) rotateX(2.5deg)'});
+  $$('.magnetic').forEach(button=>{button.addEventListener('pointermove',event=>{const rect=button.getBoundingClientRect();const x=event.clientX-rect.left-rect.width/2;const y=event.clientY-rect.top-rect.height/2;button.style.transform=`translate(${x*.06}px, ${y*.06}px)`});button.addEventListener('pointerleave',()=>button.style.transform='')});
 }
 
-// Subtle 3D tilt on cards
-$$('.tilt-card').forEach(card => {
-  card.addEventListener('pointermove', e => {
-    if (window.innerWidth < 760) return;
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5;
-    const y = (e.clientY - r.top) / r.height - .5;
-    card.style.transform = `perspective(850px) rotateX(${y * -4}deg) rotateY(${x * 5}deg) translateY(-2px)`;
-  });
-  card.addEventListener('pointerleave', () => card.style.transform = '');
-});
-
-// ---------- Local portfolio assistant ----------
-const portfolio = {
-  name: 'Oyindamola Tolulope Dare',
-  location: 'Lagos State, Nigeria',
-  email: 'dareoyindamola22@gmail.com',
-  phone: '+234 808 971 4844',
-  linkedin: 'linkedin.com/in/oyindamola-dare-838161222',
-  summary: 'Oyindamola is a resourceful and customer-focused professional with experience across customer service, sales support, client relations, HR, recruitment administration and day-to-day business operations. Her working style emphasizes clear communication, organization, practical problem-solving and follow-through.',
-  strengths: 'Her strongest documented qualities are customer focus, communication, organization, adaptability, problem-solving, relationship management and dependable follow-through. She also has practical multichannel support experience across phone, email and chat.',
-  experience: 'Her experience includes Customer Service Representative & Sales Closer at Right Pick Stores, Customer Experience Expert at Polaris Bank Limited, HR Intern at GAO Tek Inc., Assistant to the Supervisor at Captain Cook Bakery, and Sales Attendant at Darey’s Store. She also worked as a Support Teacher in Civic Education at I.M.G. Grammar School, Ibadan.',
-  rightPick: 'At Right Pick Stores, she combines customer service and sales: engaging customers, following up leads, converting sales, processing orders, updating CRM records, resolving concerns and supporting after-sales service. A documented performance highlight is an 80% delivery rate on assigned orders, above the company target.',
-  polaris: 'At Polaris Bank Limited (April 2025 to April 2026), she worked as a Customer Experience Expert, managing high-volume customer interactions across phone, email and chat, identifying needs, resolving issues, collaborating with internal teams and helping clients understand suitable service options.',
-  gao: 'At GAO Tek Inc., she supports HR and recruitment activities including candidate sourcing and screening, applicant communication, interview coordination, records, documentation and onboarding support.',
-  captain: 'At Captain Cook Bakery (2022–2023), she supported payroll, allowance disbursement, daily operational activities and workflow coordination. The portfolio reports that improved workflows contributed to a 15% reduction in processing time.',
-  dareys: 'At Darey’s Store (2019–2022), she built her early customer-service and retail foundation through customer service, sales, inventory, cash-register accuracy, product displays and promotional support.',
-  skills: 'Her portfolio groups her skills into Customer Support, Sales, HR & Administration, Operations and Digital Tools. Examples include complaint resolution, lead follow-up, sales closing, candidate sourcing, interview coordination, onboarding support, CRM updates, workflow support, reporting, Microsoft Word, Google Suite and CRM tools.',
-  education: 'She earned a B.Sc. in Industrial Relations and Personnel Management from the University of Ilorin, Kwara State, Nigeria, in 2022.',
-  courses: 'Professional development listed in the portfolio includes Customer Analytics from the University of Pennsylvania via Coursera (2023), Virtual Customer Support & American Accent Development (2024), and Virtual Assistant training with ALX (2026).',
-  research: 'Her 2022 undergraduate research project at the University of Ilorin was “An Evaluation of Work Engagement on Job Performance: A Case Study of Pure Water Factories in Ilorin.” It developed research, information gathering, analysis, evaluation, academic writing and presentation skills.',
-  story: 'Her professional story moves from early retail service into administration, teaching, banking customer experience, remote sales and HR support. Across those roles, the consistent theme is working with people, understanding needs, organizing information or workflows, and following tasks through to a useful outcome.',
-  approach: 'Her four-step professional approach is: Understand → Organize → Execute → Follow up. She first understands the customer, task or problem, structures priorities, completes work accurately with clear communication, and stays engaged until the outcome is properly delivered.',
-  roles: 'She is open to opportunities in customer support, customer experience, sales support, HR & administration, virtual assistance and operations support.',
-  contact: 'You can contact Oyindamola at dareoyindamola22@gmail.com or +234 808 971 4844. Her LinkedIn profile is linkedin.com/in/oyindamola-dare-838161222.',
-  development: 'The portfolio does not state private weaknesses or personal challenges, so I will not invent them. A fair professional-development summary is that she is continuing to build deeper specialist experience while already working across several people-facing and operational functions. Her listed courses also show an active focus on continuous learning.',
-  challenges: 'No private personal challenges are documented in the portfolio. What is documented is a career built across different environments—retail, education, banking, remote sales, HR and operations—which shows adaptability and continued professional development.',
-  leadership: 'Her leadership and volunteer experience includes Charity Syndicate CDS Group during NYSC, where she participated in outreach supporting elderly people and hospital patients, and R.C.C.G. ushering experience from 2018 to 2025, supporting congregation logistics and coordination.',
+const portfolio={
+  positioning:'Oyindamola Dare is positioned for Remote Operations, Customer Support / Customer Success, Virtual Assistance, Sales Support, Recruitment Coordination, HR Administration and Executive / Administrative Support opportunities.',
+  value:'She helps teams stay responsive and organised by handling customer communication, CRM updates, sales follow-up, recruitment coordination, administration, records, workflow support and day-to-day operational tasks with dependable follow-through.',
+  results:'At Right Pick Stores, she achieved an 80% delivery rate on assigned orders, exceeding the company target. At Captain Cook Bakery, she contributed to improved workflows associated with a reported 15% reduction in processing time. At Polaris Bank, she handled customer interactions across phone, email and chat.',
+  rightPick:'At Right Pick Stores, Oyindamola works as a Customer Service Representative & Sales Closer. Her responsibilities include lead follow-up, sales conversion, customer support, order processing, CRM updates, operational coordination and after-sales support.',
+  polaris:'At Polaris Bank, she worked as a Customer Experience Expert from April 2025 to April 2026, managing high-volume customer interactions across phone, email and chat, identifying needs, resolving issues and collaborating with internal teams.',
+  gao:'At GAO Tek Inc., she supports HR and recruitment through candidate sourcing, screening, candidate communication, interview coordination, records, documentation and onboarding support.',
+  captain:'At Captain Cook Bakery, she supported payroll and allowance processes, daily operations and workflow coordination. She contributed to improved workflows associated with a reported 15% reduction in processing time.',
+  dareys:'At Darey’s Store, she built early experience in customer service, retail sales, inventory, cash handling and promotional activities from 2019 to 2022.',
+  tools:'Her documented tool experience includes Microsoft Word, Google Workspace / Google Suite, CRM tools, and customer communication across phone, email and chat.',
+  education:'Oyindamola holds a B.Sc. in Industrial Relations & Personnel Management from the University of Ilorin (2022). Her professional development includes Customer Analytics from the University of Pennsylvania via Coursera (2023), Virtual Customer Support & American Accent Development (2024), and Virtual Assistant training from ALX (2026).',
+  contact:'You can contact Oyindamola at dareoyindamola22@gmail.com, call +234 808 971 4844, or connect on LinkedIn at linkedin.com/in/oyindamola-dare-838161222.',
+  availability:'She is currently presented as open to remote and international opportunities, especially roles involving operations, customer support / customer success, virtual assistance, sales support, recruitment coordination and administration.'
 };
 
-const intents = [
-  { keys: ['weakness','weaknesses','development area','improve','improvement','gap'], answer: portfolio.development },
-  { keys: ['challenge','challenges','struggle','difficulty','difficulties'], answer: portfolio.challenges },
-  { keys: ['right pick','rightpick','sales closer','delivery rate','80%'], answer: portfolio.rightPick },
-  { keys: ['polaris','bank','banking'], answer: portfolio.polaris },
-  { keys: ['gao','recruitment','hr intern'], answer: portfolio.gao },
-  { keys: ['captain cook','bakery','15%','processing time'], answer: portfolio.captain },
-  { keys: ["darey's",'dareys','retail','sales attendant'], answer: portfolio.dareys },
-  { keys: ['education','degree','university','school','b.sc','bsc'], answer: portfolio.education },
-  { keys: ['course','courses','certificate','certification','alx','coursera','analytics'], answer: portfolio.courses },
-  { keys: ['research','project','work engagement','job performance'], answer: portfolio.research },
-  { keys: ['skill','skills','capability','capabilities','tools','crm','google suite'], answer: portfolio.skills },
-  { keys: ['strength','strengths','best quality','strongest'], answer: portfolio.strengths },
-  { keys: ['story','history','journey','career path','background'], answer: portfolio.story },
-  { keys: ['approach','work style','how does she work','method'], answer: portfolio.approach },
-  { keys: ['leadership','volunteer','nysc','church','rccg'], answer: portfolio.leadership },
-  { keys: ['experience','worked','work experience','career'], answer: portfolio.experience },
-  { keys: ['role','roles','opportunity','opportunities','looking for','open to'], answer: portfolio.roles },
-  { keys: ['contact','email','phone','linkedin','reach'], answer: portfolio.contact },
-  { keys: ['where','location','based','live'], answer: `Oyindamola is based in ${portfolio.location}.` },
-  { keys: ['who','about','tell me about','summary'], answer: portfolio.summary },
-];
-
-function answerQuestion(q) {
-  const query = q.toLowerCase().replace(/[^a-z0-9%+'\s.-]/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!query) return 'Ask me anything about Oyindamola’s professional portfolio.';
-
-  let best = null;
-  let bestScore = 0;
-  for (const intent of intents) {
-    let score = 0;
-    for (const key of intent.keys) {
-      if (query.includes(key)) score += key.split(' ').length + 1;
-    }
-    if (score > bestScore) { best = intent; bestScore = score; }
-  }
-  if (best) return best.answer;
-
-  if (query.includes('salary') || query.includes('age') || query.includes('relationship') || query.includes('married') || query.includes('family')) {
-    return 'That information is not included in Oyindamola’s professional portfolio, so I won’t guess or invent it. I can help with her experience, skills, education, achievements, professional story or contact details instead.';
-  }
-
-  return `I don’t have a documented answer to that specific question in Oyindamola’s portfolio, and I won’t make one up. I can answer about her experience, skills, education, achievements, career story, work approach, professional-development areas and contact information.`;
+function answerQuestion(rawQuestion){
+  const q=rawQuestion.trim().toLowerCase();
+  if(!q)return 'Ask me about Oyindamola’s services, experience, results, tools, suitability for remote work or contact details.';
+  if(/(contact|email|phone|linkedin|reach|hire|talk)/.test(q))return portfolio.contact;
+  if(/(result|achiev|metric|proof|80|15|impact)/.test(q))return portfolio.results;
+  if(/(right pick|sales closer|order|delivery rate)/.test(q))return portfolio.rightPick;
+  if(/(polaris|bank|customer experience)/.test(q))return portfolio.polaris;
+  if(/(gao|recruit|candidate|interview|onboard|hr)/.test(q))return portfolio.gao;
+  if(/(captain cook|processing time|payroll|allowance)/.test(q))return portfolio.captain;
+  if(/(darey|retail|inventory|cash)/.test(q))return portfolio.dareys;
+  if(/(tool|software|google|word|crm|platform)/.test(q))return portfolio.tools;
+  if(/(education|degree|university|course|certif|study)/.test(q))return portfolio.education;
+  if(/(available|remote|international|location|opportunit|role)/.test(q))return `${portfolio.availability} ${portfolio.positioning}`;
+  if(/(service|skill|support|take off|help|handle|independent|operations|virtual assistant|\bva\b)/.test(q))return `${portfolio.value} ${portfolio.positioning}`;
+  if(/(suitable|why|strength|value|business|founder|team)/.test(q))return `Her strongest value is dependable follow-through across customer-facing and operational work. ${portfolio.value} ${portfolio.results}`;
+  return `Oyindamola’s portfolio is centred on remote operations, customer support, virtual assistance, sales support and recruitment coordination. ${portfolio.value} If you want, ask me about her results, a specific role, tools, education or contact details.`;
 }
 
-const chatLauncher = $('#chatLauncher');
-const chatPanel = $('#chatPanel');
-const chatClose = $('#chatClose');
-const chatForm = $('#chatForm');
-const chatInput = $('#chatInput');
-const chatMessages = $('#chatMessages');
+const launcher=$("#chatLauncher"),panel=$("#chatPanel"),closeButton=$("#chatClose"),form=$("#chatForm"),input=$("#chatInput"),messages=$("#chatMessages"),quickPrompts=$("#quickPrompts");
+function setChat(open){panel?.classList.toggle('open',open);panel?.setAttribute('aria-hidden',String(!open));launcher?.setAttribute('aria-expanded',String(open));document.body.classList.toggle('chat-open',open&&window.innerWidth<760);if(open)window.setTimeout(()=>input?.focus(),120)}
+launcher?.addEventListener('click',()=>setChat(!panel?.classList.contains('open')));
+closeButton?.addEventListener('click',()=>setChat(false));
+document.addEventListener('keydown',event=>{if(event.key==='Escape')setChat(false)});
 
-function openChat() {
-  chatPanel.classList.add('open');
-  chatPanel.setAttribute('aria-hidden', 'false');
-  chatLauncher.setAttribute('aria-expanded', 'true');
-  setTimeout(() => chatInput.focus(), 180);
-}
-function closeChat() {
-  chatPanel.classList.remove('open');
-  chatPanel.setAttribute('aria-hidden', 'true');
-  chatLauncher.setAttribute('aria-expanded', 'false');
-}
-chatLauncher.addEventListener('click', () => chatPanel.classList.contains('open') ? closeChat() : openChat());
-chatClose.addEventListener('click', closeChat);
-
-function addMessage(text, type) {
-  const wrap = document.createElement('div');
-  wrap.className = `message ${type}`;
-  const p = document.createElement('p');
-  p.textContent = text;
-  wrap.appendChild(p);
-  chatMessages.appendChild(wrap);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function ask(text) {
-  const clean = text.trim();
-  if (!clean) return;
-  addMessage(clean, 'user');
-  chatInput.value = '';
-  setTimeout(() => addMessage(answerQuestion(clean), 'bot'), 260);
-}
-chatForm.addEventListener('submit', e => { e.preventDefault(); ask(chatInput.value); });
-$$('#quickPrompts button').forEach(btn => btn.addEventListener('click', () => { openChat(); ask(btn.textContent); }));
-
-// Escape closes chat/menu
-window.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeChat();
-    navLinks.classList.remove('open');
-    menuBtn.setAttribute('aria-expanded', 'false');
-  }
-});
+function addMessage(text,type){if(!messages)return;const wrap=document.createElement('div');wrap.className=`message ${type}`;const paragraph=document.createElement('p');paragraph.textContent=text;wrap.appendChild(paragraph);messages.appendChild(wrap);messages.scrollTop=messages.scrollHeight}
+function ask(question){const clean=question.trim();if(!clean)return;addMessage(clean,'user');if(input)input.value='';window.setTimeout(()=>addMessage(answerQuestion(clean),'bot'),180)}
+form?.addEventListener('submit',event=>{event.preventDefault();ask(input?.value||'')});
+$$('button',quickPrompts||document.createElement('div')).forEach(button=>button.addEventListener('click',()=>ask(button.textContent||'')));
